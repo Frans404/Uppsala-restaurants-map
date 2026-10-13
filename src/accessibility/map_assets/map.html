@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Uppsala · Population grid</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23155453'/%3E%3Cpath d='M11 5v22M21 5v22M5 11h22M5 21h22' stroke='%23a9ddd0' stroke-width='2'/%3E%3C/svg%3E">
+<style>/* LEAFLET_CSS */</style>
+<style>
+*{box-sizing:border-box}body{margin:0;color:#163c3b;background:#f4f6f2;font:15px/1.5 system-ui,sans-serif}header{height:82px;display:flex;align-items:center;justify-content:space-between;padding:14px 28px;border-bottom:1px solid #d5dfd9;background:#fff}h1{font-size:22px;margin:0;letter-spacing:-.7px}.eyebrow{font-size:11px;letter-spacing:2px;font-weight:700;color:#637d77;text-transform:uppercase}.date{border:1px solid #d5dfd9;border-radius:20px;padding:7px 14px;font-size:12px}main{display:grid;grid-template-columns:330px 1fr;height:calc(100dvh - 82px)}aside{overflow:auto;padding:24px;background:#fbfcf9;border-right:1px solid #d5dfd9}h2{font-size:17px;margin:0 0 10px}h3{font-size:13px;margin:24px 0 8px}.muted{font-size:12px;color:#5b716c}.count{font-size:38px;font-weight:650;letter-spacing:-1px;line-height:1.2;margin-top:10px}button,select{font:inherit;border:1px solid #b9ccc4;border-radius:6px;padding:8px;background:white;color:#163c3b;cursor:pointer}button:hover{background:#e5f0e9}button:focus-visible,select:focus-visible{outline:3px solid #d99030;outline-offset:3px}#fit{width:100%;margin:16px 0}select{width:100%;margin:6px 0 18px}label{font-size:12px;font-weight:600}.legend{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:11px;margin-bottom:22px}.swatch{height:6px;border-radius:2px;margin-bottom:4px}.note{background:#edf1e8;padding:12px;border-radius:8px;font-size:12px;margin-top:18px}.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:15px}.stat{padding:10px;background:#edf3ed;border-radius:7px}.stat strong{display:block;font-size:20px}#map{height:100%;background:#e2e9df}.mapwrap{position:relative;min-width:0;min-height:0}#status{position:absolute;bottom:32px;left:12px;z-index:500;background:#fff;padding:6px 10px;border-radius:5px;max-width:85%;font-size:12px;box-shadow:0 1px 6px #0002}table{width:100%;border-collapse:collapse;font-size:12px}td{padding:5px 0;border-bottom:1px solid #e4eae1}td:last-child{text-align:right;font-variant-numeric:tabular-nums}a{color:#176a64}#details{border-top:1px solid #d5dfd9;padding-top:20px}#cell-id{font-size:12px;overflow-wrap:anywhere}.leaflet-container{font-family:inherit}.leaflet-interactive:focus{outline:none;stroke:#d99030;stroke-width:3}
+@media(max-width:700px){header{padding:12px 16px;height:74px}h1{font-size:19px}.date{font-size:10px;padding:5px 8px}main{height:auto;display:flex;flex-direction:column}.mapwrap{order:-1;height:55dvh;min-height:320px}aside{padding:20px;overflow:visible;border-right:0}.legend{grid-template-columns:repeat(6,1fr)}#fit{width:auto;display:block}.count{font-size:32px}}
+</style>
+</head>
+<body>
+<header><div><div class="eyebrow">Sweden accessibility map</div><h1>Uppsala population</h1></div><span class="date">31 December 2025</span></header>
+<main>
+<aside aria-label="Population grid details">
+<h2>People, square by square</h2>
+<p class="muted"><span id="cell-count">Loading</span> · 1 × 1 km cells<br>Click a square to explore its population.</p>
+<button id="fit" type="button">Show all cells ↗</button>
+<label for="cell-picker">Choose a cell</label><select id="cell-picker"><option value="">Select on the map or here</option></select>
+<div class="legend" aria-label="Population colour scale"></div>
+<h2>Restaurants</h2>
+<label><input type="checkbox" id="show-restaurants" checked> Show orange restaurant markers</label>
+<p id="restaurant-count" class="muted"></p>
+<label for="restaurant-picker">Choose a restaurant</label>
+<select id="restaurant-picker"><option value="">Select a restaurant</option></select>
+<div id="restaurant-details" class="note" hidden aria-live="polite"></div>
+<p class="muted">Source: SCB business register · active workplaces with primary restaurant activity. Locations use registered address coordinates.</p>
+<section id="details" aria-live="polite"><h2 id="detail-title">Explore the grid</h2><p id="empty" class="muted">Darker squares contain more residents. Zoom in to explore central Uppsala or pan to the surrounding countryside.</p><div id="selected" hidden><div id="cell-id"></div><div class="count" id="population"></div><div class="muted">residents in this cell</div><div class="stats"><div class="stat"><span class="muted">Men</span><strong id="men"></strong></div><div class="stat"><span class="muted">Women</span><strong id="women"></strong></div></div><div id="border" class="note" hidden></div><h3>Residents by age</h3><table aria-label="Population by age"><tbody id="ages"></tbody></table></div></section>
+<p class="note">Cells crossing the municipal border include their full population. SCB’s disclosure protection means age and sex counts may not add up to the total. Missing values are shown as “Not available”.</p>
+<p class="muted">Source: <a href="https://www.scb.se/vara-tjanster/oppna-data/oppna-geodata/statistik-pa-rutor/" target="_blank" rel="noopener">Statistics Sweden (SCB)</a>. Only cells published by SCB are shown.</p>
+</aside>
+<div class="mapwrap"><div id="map" aria-label="Interactive map of Uppsala population grid"></div><div id="status" role="status">Loading map…</div></div>
+</main>
+<noscript>Enable JavaScript to use the interactive map.</noscript>
+<script>/* LEAFLET_JS */</script>
+<script type="application/json" id="grid-data">__GRID_DATA__</script>
+<script type="application/json" id="restaurant-data">__RESTAURANT_DATA__</script>
+<script>
+const data=JSON.parse(document.getElementById('grid-data').textContent);
+const fmt=n=>n==null?'Not available':Number(n).toLocaleString('en-GB');
+const bins=[{min:0,label:'0–9',color:'#dcefc9'},{min:10,label:'10–49',color:'#a9d7bb'},{min:50,label:'50–199',color:'#70bca8'},{min:200,label:'200–999',color:'#389a92'},{min:1000,label:'1k–4,999',color:'#176e77'},{min:5000,label:'5,000+',color:'#163d55'}];
+const color=n=>n==null?'#959da4':[...bins].reverse().find(b=>n>=b.min).color;
+const legend=document.querySelector('.legend');
+for(const b of [...bins,{label:'No data',color:'#959da4'}]){const item=document.createElement('div'),swatch=document.createElement('div');swatch.className='swatch';swatch.style.background=b.color;item.append(swatch,document.createTextNode(b.label));legend.append(item)}
+document.getElementById('cell-count').textContent=fmt(data.features.length)+' grid cells';
+const map=L.map('map',{scrollWheelZoom:true});
+const tiles=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors · Population: SCB'}).addTo(map);
+const status=document.getElementById('status');let tileFailed=false;
+tiles.on('tileerror',()=>{tileFailed=true;status.textContent='Background map unavailable. Population cells still work.'});
+tiles.on('load',()=>{if(!tileFailed)status.textContent='Click any cell for population details'});
+const baseStyle=f=>({color:'#346a65',weight:.65,fillColor:color(f.properties.population),fillOpacity:.72});
+let selectedLayer;const layers=new Map();
+function selectCell(layer,zoom=false){
+ if(selectedLayer)grid.resetStyle(selectedLayer);
+ selectedLayer=layer;layer.setStyle({color:'#ef9c35',weight:3,fillOpacity:.9});layer.bringToFront();
+ const p=layer.feature.properties;document.getElementById('cell-picker').value=p.cell_id;
+ document.getElementById('empty').hidden=true;document.getElementById('selected').hidden=false;
+ document.getElementById('detail-title').textContent='Selected cell';document.getElementById('cell-id').textContent='Cell '+p.cell_id;
+ document.getElementById('population').textContent=fmt(p.population);document.getElementById('men').textContent=fmt(p.man);document.getElementById('women').textContent=fmt(p.kvinna);
+ const border=document.getElementById('border');border.hidden=p.overlap_fraction>=.999999;border.textContent='Border cell · '+(p.overlap_fraction*100).toFixed(1)+'% of its area lies inside Uppsala. The count covers the whole cell.';
+ const body=document.getElementById('ages');body.replaceChildren();
+ for(let age=0;age<=100;age+=5){const row=document.createElement('tr'),name=document.createElement('td'),value=document.createElement('td');name.textContent=age===100?'100+':age+'–'+(age+4);value.textContent=fmt(p[age===100?'ald100w':'ald'+age+'_'+(age+4)]);row.append(name,value);body.append(row)}
+ const popup=document.createElement('div');popup.textContent=fmt(p.population)+' residents · cell '+p.cell_id;layer.bindPopup(popup).openPopup();
+ if(zoom)map.fitBounds(layer.getBounds(),{maxZoom:14,padding:[35,35]});
+}
+const grid=L.geoJSON(data,{style:baseStyle,onEachFeature:(feature,layer)=>{
+ layers.set(feature.properties.cell_id,layer);
+ const tip=document.createElement('span');tip.textContent=fmt(feature.properties.population)+' residents';layer.bindTooltip(tip,{sticky:true});
+ layer.on('click',()=>selectCell(layer));
+ layer.on('mouseover',()=>{if(layer!==selectedLayer)layer.setStyle({weight:2,fillOpacity:.9})});
+ layer.on('mouseout',()=>{if(layer!==selectedLayer)grid.resetStyle(layer)});
+}}).addTo(map);
+map.fitBounds(grid.getBounds(),{padding:[20,20]});L.control.scale({imperial:false}).addTo(map);
+for(const [id,layer] of layers){const option=document.createElement('option');option.value=id;option.textContent=id+' · '+fmt(layer.feature.properties.population)+' residents';document.getElementById('cell-picker').append(option)}
+document.getElementById('cell-picker').addEventListener('change',e=>{if(layers.has(e.target.value))selectCell(layers.get(e.target.value),true)});
+document.getElementById('fit').addEventListener('click',()=>map.fitBounds(grid.getBounds(),{padding:[20,20]}));
+status.textContent='Click any cell for population details';
+const restaurants=JSON.parse(document.getElementById('restaurant-data').textContent);
+map.createPane('restaurants');map.getPane('restaurants').style.zIndex=450;
+const restaurantLayer=L.layerGroup().addTo(map), restaurantMarkers=new Map();
+const picker=document.getElementById('restaurant-picker');
+function restaurantContent(r){
+ const content=document.createElement('div');
+ const title=document.createElement('strong');title.textContent=r.name;content.append(title);
+ for(const text of [r.street_address,[r.postal_code,r.postal_locality].filter(Boolean).join(' '),
+   'CFAR '+r.cfar_number,'SCB retrieved '+r.retrieved_at.slice(0,10),
+   r.coordinates?'Registered address location':'No address coordinates available; not shown on the map']){
+  const line=document.createElement('div');line.textContent=text||'Address not available';content.append(line);
+ }return content;
+}
+function selectRestaurant(r,zoom=false){
+ picker.value=r.cfar_number;
+ const details=document.getElementById('restaurant-details');details.hidden=false;details.replaceChildren(restaurantContent(r));
+ const marker=restaurantMarkers.get(r.cfar_number);
+ if(marker){document.getElementById('show-restaurants').checked=true;map.addLayer(restaurantLayer);
+  if(zoom)map.setView(r.coordinates,16);marker.openPopup();
+ }else{map.closePopup()}
+}
+const groups=new Map();
+for(const r of restaurants){
+ const option=document.createElement('option');option.value=r.cfar_number;option.textContent=r.name+' · '+(r.street_address||r.cfar_number)+(r.coordinates?'':' (no coordinates)');picker.append(option);
+ if(r.coordinates){const key=r.coordinates.join(',');if(!groups.has(key))groups.set(key,[]);groups.get(key).push(r)}
+}
+for(const group of groups.values()){
+ const marker=L.circleMarker(group[0].coordinates,{pane:'restaurants',radius:7,color:'#fff',weight:2,fillColor:'#c44e16',fillOpacity:1}).addTo(restaurantLayer);
+ const popup=document.createElement('div');popup.style.maxHeight='250px';popup.style.overflowY='auto';
+ for(const r of group){restaurantMarkers.set(r.cfar_number,marker);const item=restaurantContent(r);item.style.marginBottom='12px';popup.append(item)}
+ marker.bindPopup(popup,{maxWidth:320});
+ const tip=document.createElement('span');tip.textContent=group.length===1?group[0].name:group.length+' restaurants at this location';marker.bindTooltip(tip);
+ marker.on('click',()=>selectRestaurant(group[0]));
+}
+const located=restaurants.filter(r=>r.coordinates).length;
+document.getElementById('restaurant-count').textContent=fmt(located)+' of '+fmt(restaurants.length)+' restaurants mapped. '+fmt(restaurants.length-located)+' lack address coordinates and are available in the list. Restaurants sharing a location are grouped in one marker.';
+picker.addEventListener('change',e=>{const r=restaurants.find(r=>r.cfar_number===e.target.value);if(r)selectRestaurant(r,true)});
+document.getElementById('show-restaurants').addEventListener('change',e=>{if(e.target.checked)map.addLayer(restaurantLayer);else map.removeLayer(restaurantLayer)});
+</script>
+</body></html>

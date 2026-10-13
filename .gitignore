@@ -20,3 +20,8 @@ htmlcov/
 .env.*
 !.env.example
 .DS_Store
+
+# Generated local databases
+data/processed/*.sqlite3*
+data/processed/*population_grid*.geojson*
+data/processed/*population_map.html
