@@ -9,6 +9,17 @@ from test_restaurants import restaurant
 
 
 class RestaurantMapTests(unittest.TestCase):
+    def test_restaurants_per_resident(self):
+        from shapely.geometry import box, mapping
+        features = [{"geometry": mapping(box(x, 0, x+1, 1)),
+                     "properties": {"cell_id": str(x), "population": population}}
+                    for x, population in enumerate([100, 0, None, 200])]
+        restaurants = [{"cfar_number": str(i), "coordinates": [.5, x]}
+                       for i, x in enumerate([.5, .5, 1.5, 2.5])]
+        count_restaurants(features, restaurants)
+        self.assertEqual([f['properties']['restaurants_per_resident'] for f in features],
+                         [.02, None, None, 0])
+
     def test_spatial_counts_shared_addresses_edges_and_missing_points(self):
         from shapely.geometry import box, mapping
         features = [{"geometry": mapping(box(x, 0, x+1, 1)),

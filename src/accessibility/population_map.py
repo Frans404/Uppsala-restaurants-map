@@ -55,6 +55,12 @@ def count_restaurants(features, restaurants):
             # Shared-edge points go to the lowest cell ID, avoiding double counts.
             index = min(matches, key=lambda i: features[i]["properties"]["cell_id"])
             features[index]["properties"]["restaurant_count"] += 1
+    for feature in features:
+        properties = feature["properties"]
+        population = properties.get("population")
+        properties["restaurants_per_resident"] = (
+            properties["restaurant_count"] / population
+            if population is not None and population > 0 else None)
 
 
 def build_map(database=DEFAULT_DB, output=OUTPUT, restaurants_database=RESTAURANTS_DB):

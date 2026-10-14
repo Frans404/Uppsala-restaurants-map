@@ -10,6 +10,10 @@ python3.12 -m http.server 8000 --bind 127.0.0.1 --directory data/processed
 
 Open http://127.0.0.1:8000/uppsala_population_map.html in your browser.
 It shows all imported 2025 population cells with a population colour scale.
+Use “Heat map shows” to switch between residents, restaurant counts and
+restaurants per resident. All modes use light-to-dark red, with metric-specific
+legend ranges; grey indicates unavailable values. Changing the metric preserves
+the selected cell and restaurant markers.
 Click a cell for total population, sex counts, age groups and border overlap.
 Cell details, hover tooltips and popups also show restaurant counts based on
 registered address points inside that cell. Distinct CFAR workplaces sharing an
@@ -17,6 +21,9 @@ address count separately. Missing coordinates and points outside the displayed
 grid are excluded. A point exactly on a shared edge is assigned once, to the
 lowest cell ID. Counts use the current restaurant import, not the population's
 2025 reference date, and are recalculated whenever the map is rebuilt.
+Each cell also shows restaurants per resident: restaurant count divided by its
+2025 population, displayed to four significant digits. Zero or missing population
+produces “Not available”; zero restaurants with positive population produces 0.
 You can also select a cell using the dropdown, pan/zoom, or choose “Show all cells”.
 
 Orange markers show restaurant workplaces. Click one for its name, address and
