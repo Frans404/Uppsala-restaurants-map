@@ -3,12 +3,25 @@ import sqlite3
 import tempfile
 import unittest
 
-from accessibility.population_map import load_restaurants
+from accessibility.population_map import load_restaurants, count_restaurants
 from accessibility.restaurants import save_restaurants
 from test_restaurants import restaurant
 
 
 class RestaurantMapTests(unittest.TestCase):
+    def test_spatial_counts_shared_addresses_edges_and_missing_points(self):
+        from shapely.geometry import box, mapping
+        features = [{"geometry": mapping(box(x, 0, x+1, 1)),
+                     "properties": {"cell_id": str(x)}} for x in range(3)]
+        restaurants = [{"cfar_number": str(i), "coordinates": point}
+                       for i, point in enumerate([
+                           [.5, .5], [.5, .5], [.5, 1], [.5, 1.5],
+                           None, [5, 5]])]
+        count_restaurants(features, restaurants)
+        self.assertEqual([f['properties']['restaurant_count'] for f in features], [3, 1, 0])
+        count_restaurants(features, restaurants)
+        self.assertEqual(sum(f['properties']['restaurant_count'] for f in features), 4)
+
     def test_address_projection_and_missing_locations(self):
         with tempfile.TemporaryDirectory() as directory:
             database = Path(directory) / 'restaurants.sqlite3'

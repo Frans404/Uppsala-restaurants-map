@@ -32,6 +32,31 @@ def load_restaurants(database):
     return records
 
 
+def count_restaurants(features, restaurants):
+    """Count each located workplace once, including distinct workplaces sharing an address."""
+    from shapely.geometry import Point, shape
+    from shapely import STRtree
+    polygons = [shape(feature["geometry"]) for feature in features]
+    tree = STRtree(polygons)
+    for feature in features:
+        feature["properties"]["restaurant_count"] = 0
+    seen = set()
+    for restaurant in restaurants:
+        identifier = restaurant["cfar_number"]
+        if identifier in seen:
+            raise ValueError("Duplicate restaurant CFAR identifier")
+        seen.add(identifier)
+        coordinates = restaurant["coordinates"]
+        if coordinates is None:
+            continue
+        latitude, longitude = coordinates
+        matches = tree.query(Point(longitude, latitude), predicate="intersects")
+        if len(matches):
+            # Shared-edge points go to the lowest cell ID, avoiding double counts.
+            index = min(matches, key=lambda i: features[i]["properties"]["cell_id"])
+            features[index]["properties"]["restaurant_count"] += 1
+
+
 def build_map(database=DEFAULT_DB, output=OUTPUT, restaurants_database=RESTAURANTS_DB):
     database, output = Path(database), Path(output)
     with sqlite3.connect(database.resolve().as_uri() + "?mode=ro", uri=True) as db:
@@ -46,11 +71,13 @@ def build_map(database=DEFAULT_DB, output=OUTPUT, restaurants_database=RESTAURAN
         properties.update(cell_id=cell, population=population, overlap_fraction=overlap)
         features.append({"type": "Feature", "id": cell,
                          "geometry": json.loads(geometry), "properties": properties})
+    restaurant_records = load_restaurants(restaurants_database)
+    count_restaurants(features, restaurant_records)
     data = json.dumps({"type": "FeatureCollection", "features": features})
     # Prevent source strings from closing the embedded JSON script element.
     data = data.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
     html = (ASSETS / "map.html").read_text(encoding="utf-8")
-    restaurants = json.dumps(load_restaurants(restaurants_database))
+    restaurants = json.dumps(restaurant_records)
     restaurants = restaurants.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
     for token, content in [("/* LEAFLET_CSS */", (ASSETS / "leaflet.css").read_text()),
                            ("/* LEAFLET_JS */", (ASSETS / "leaflet.js").read_text()),

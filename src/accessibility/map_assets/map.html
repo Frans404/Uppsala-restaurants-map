@@ -26,7 +26,7 @@
 <select id="restaurant-picker"><option value="">Select a restaurant</option></select>
 <div id="restaurant-details" class="note" hidden aria-live="polite"></div>
 <p class="muted">Source: SCB business register · active workplaces with primary restaurant activity. Locations use registered address coordinates.</p>
-<section id="details" aria-live="polite"><h2 id="detail-title">Explore the grid</h2><p id="empty" class="muted">Darker squares contain more residents. Zoom in to explore central Uppsala or pan to the surrounding countryside.</p><div id="selected" hidden><div id="cell-id"></div><div class="count" id="population"></div><div class="muted">residents in this cell</div><div class="stats"><div class="stat"><span class="muted">Men</span><strong id="men"></strong></div><div class="stat"><span class="muted">Women</span><strong id="women"></strong></div></div><div id="border" class="note" hidden></div><h3>Residents by age</h3><table aria-label="Population by age"><tbody id="ages"></tbody></table></div></section>
+<section id="details" aria-live="polite"><h2 id="detail-title">Explore the grid</h2><p id="empty" class="muted">Darker squares contain more residents. Zoom in to explore central Uppsala or pan to the surrounding countryside.</p><div id="selected" hidden><div id="cell-id"></div><div class="count" id="population"></div><div class="muted">residents in this cell</div><div class="stat" style="margin-top:12px"><span>Restaurants in this cell</span><strong id="cell-restaurants"></strong><span class="muted">Based on registered address locations; excludes restaurants without coordinates.</span></div><div class="stats"><div class="stat"><span class="muted">Men</span><strong id="men"></strong></div><div class="stat"><span class="muted">Women</span><strong id="women"></strong></div></div><div id="border" class="note" hidden></div><h3>Residents by age</h3><table aria-label="Population by age"><tbody id="ages"></tbody></table></div></section>
 <p class="note">Cells crossing the municipal border include their full population. SCB’s disclosure protection means age and sex counts may not add up to the total. Missing values are shown as “Not available”.</p>
 <p class="muted">Source: <a href="https://www.scb.se/vara-tjanster/oppna-data/oppna-geodata/statistik-pa-rutor/" target="_blank" rel="noopener">Statistics Sweden (SCB)</a>. Only cells published by SCB are shown.</p>
 </aside>
@@ -57,16 +57,17 @@ function selectCell(layer,zoom=false){
  const p=layer.feature.properties;document.getElementById('cell-picker').value=p.cell_id;
  document.getElementById('empty').hidden=true;document.getElementById('selected').hidden=false;
  document.getElementById('detail-title').textContent='Selected cell';document.getElementById('cell-id').textContent='Cell '+p.cell_id;
+ document.getElementById('cell-restaurants').textContent=fmt(p.restaurant_count);
  document.getElementById('population').textContent=fmt(p.population);document.getElementById('men').textContent=fmt(p.man);document.getElementById('women').textContent=fmt(p.kvinna);
  const border=document.getElementById('border');border.hidden=p.overlap_fraction>=.999999;border.textContent='Border cell · '+(p.overlap_fraction*100).toFixed(1)+'% of its area lies inside Uppsala. The count covers the whole cell.';
  const body=document.getElementById('ages');body.replaceChildren();
  for(let age=0;age<=100;age+=5){const row=document.createElement('tr'),name=document.createElement('td'),value=document.createElement('td');name.textContent=age===100?'100+':age+'–'+(age+4);value.textContent=fmt(p[age===100?'ald100w':'ald'+age+'_'+(age+4)]);row.append(name,value);body.append(row)}
- const popup=document.createElement('div');popup.textContent=fmt(p.population)+' residents · cell '+p.cell_id;layer.bindPopup(popup).openPopup();
+ const popup=document.createElement('div');popup.textContent=fmt(p.population)+' residents · '+fmt(p.restaurant_count)+' restaurants · cell '+p.cell_id;layer.bindPopup(popup).openPopup();
  if(zoom)map.fitBounds(layer.getBounds(),{maxZoom:14,padding:[35,35]});
 }
 const grid=L.geoJSON(data,{style:baseStyle,onEachFeature:(feature,layer)=>{
  layers.set(feature.properties.cell_id,layer);
- const tip=document.createElement('span');tip.textContent=fmt(feature.properties.population)+' residents';layer.bindTooltip(tip,{sticky:true});
+ const tip=document.createElement('span');tip.textContent=fmt(feature.properties.population)+' residents · '+fmt(feature.properties.restaurant_count)+' restaurants';layer.bindTooltip(tip,{sticky:true});
  layer.on('click',()=>selectCell(layer));
  layer.on('mouseover',()=>{if(layer!==selectedLayer)layer.setStyle({weight:2,fillOpacity:.9})});
  layer.on('mouseout',()=>{if(layer!==selectedLayer)grid.resetStyle(layer)});
