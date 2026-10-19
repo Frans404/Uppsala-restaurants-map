@@ -1,6 +1,7 @@
 """Build a standalone clickable population map from the local SQLite database."""
 
 import argparse
+from html import escape
 import json
 from pathlib import Path
 import sqlite3
@@ -86,11 +87,16 @@ def build_map(database=DEFAULT_DB, output=OUTPUT, restaurants_database=RESTAURAN
     restaurants = json.dumps(restaurant_records)
     restaurants = restaurants.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
     for token, content in [("/* LEAFLET_CSS */", (ASSETS / "leaflet.css").read_text()),
+                           ("/* SITE_THEME */", (ASSETS / "theme.css").read_text()),
                            ("/* LEAFLET_JS */", (ASSETS / "leaflet.js").read_text()),
                            ("__GRID_DATA__", data), ("__RESTAURANT_DATA__", restaurants)]:
         html = html.replace(token, content)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(html, encoding="utf-8")
+    about = (ASSETS / "about.html").read_text(encoding="utf-8")
+    about = about.replace("/* SITE_THEME */", (ASSETS / "theme.css").read_text())
+    about = about.replace("__MAP_FILE__", escape(output.name, quote=True))
+    (output.parent / "about.html").write_text(about, encoding="utf-8")
     return len(features)
 
 

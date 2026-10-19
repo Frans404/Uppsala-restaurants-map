@@ -2,20 +2,21 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Uppsala · Population grid</title>
+<title>Uppsala Restaurants Map</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23155453'/%3E%3Cpath d='M11 5v22M21 5v22M5 11h22M5 21h22' stroke='%23a9ddd0' stroke-width='2'/%3E%3C/svg%3E">
 <style>/* LEAFLET_CSS */</style>
 <style>
 *{box-sizing:border-box}body{margin:0;color:#163c3b;background:#f4f6f2;font:15px/1.5 system-ui,sans-serif}header{height:82px;display:flex;align-items:center;justify-content:space-between;padding:14px 28px;border-bottom:1px solid #d5dfd9;background:#fff}h1{font-size:22px;margin:0;letter-spacing:-.7px}.eyebrow{font-size:11px;letter-spacing:2px;font-weight:700;color:#637d77;text-transform:uppercase}.date{border:1px solid #d5dfd9;border-radius:20px;padding:7px 14px;font-size:12px}main{display:grid;grid-template-columns:330px 1fr;height:calc(100dvh - 82px)}aside{overflow:auto;padding:24px;background:#fbfcf9;border-right:1px solid #d5dfd9}h2{font-size:17px;margin:0 0 10px}h3{font-size:13px;margin:24px 0 8px}.muted{font-size:12px;color:#5b716c}.count{font-size:38px;font-weight:650;letter-spacing:-1px;line-height:1.2;margin-top:10px}button,select{font:inherit;border:1px solid #b9ccc4;border-radius:6px;padding:8px;background:white;color:#163c3b;cursor:pointer}button:hover{background:#e5f0e9}button:focus-visible,select:focus-visible{outline:3px solid #d99030;outline-offset:3px}#fit{width:100%;margin:16px 0}select{width:100%;margin:6px 0 18px}label{font-size:12px;font-weight:600}.legend{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:11px;margin-bottom:22px}.swatch{height:6px;border-radius:2px;margin-bottom:4px}.note{background:#edf1e8;padding:12px;border-radius:8px;font-size:12px;margin-top:18px}.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:15px}.stat{padding:10px;background:#edf3ed;border-radius:7px}.stat strong{display:block;font-size:20px}#map{height:100%;background:#e2e9df}.mapwrap{position:relative;min-width:0;min-height:0}#status{position:absolute;bottom:32px;left:12px;z-index:500;background:#fff;padding:6px 10px;border-radius:5px;max-width:85%;font-size:12px;box-shadow:0 1px 6px #0002}table{width:100%;border-collapse:collapse;font-size:12px}td{padding:5px 0;border-bottom:1px solid #e4eae1}td:last-child{text-align:right;font-variant-numeric:tabular-nums}a{color:#176a64}#details{border-top:1px solid #d5dfd9;padding-top:20px}#cell-id{font-size:12px;overflow-wrap:anywhere}.leaflet-container{font-family:inherit}.leaflet-interactive:focus{outline:none;stroke:#d99030;stroke-width:3}
 @media(max-width:700px){header{padding:12px 16px;height:74px}h1{font-size:19px}.date{font-size:10px;padding:5px 8px}main{height:auto;display:flex;flex-direction:column}.mapwrap{order:-1;height:55dvh;min-height:320px}aside{padding:20px;overflow:visible;border-right:0}.legend{grid-template-columns:repeat(6,1fr)}#fit{width:auto;display:block}.count{font-size:32px}}
+/* SITE_THEME */
 </style>
 </head>
 <body>
-<header><div><div class="eyebrow">Sweden accessibility map</div><h1>Uppsala population</h1></div><span class="date">31 December 2025</span></header>
+<header><div><div class="eyebrow">A little curiosity, mapped</div><h1>Uppsala Restaurants Map</h1></div><div class="header-right"><span class="date">Population · 2025</span><nav aria-label="Main navigation"><a href="#map" aria-current="page">Map</a><a href="about.html">About</a></nav></div></header>
 <main>
 <aside aria-label="Population grid details">
-<h2>People, square by square</h2>
-<p class="muted"><span id="cell-count">Loading</span> · 1 × 1 km cells<br>Click a square to explore its population.</p>
+<h2>A taste of the neighbourhood</h2>
+<p class="muted"><span id="cell-count">Loading</span> · 1 × 1 km cells<br>Pick a square. See who lives—and cooks—nearby.</p>
 <button id="fit" type="button">Show all cells ↗</button>
 <label for="cell-picker">Choose a cell</label><select id="cell-picker"><option value="">Select on the map or here</option></select>
 <label for="heatmap-metric">Heat map shows</label>

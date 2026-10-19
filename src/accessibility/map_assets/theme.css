@@ -1,0 +1,19 @@
+body{color:#49352f;background:#fffaf3;font-family:ui-rounded,"Trebuchet MS",system-ui,sans-serif}
+header{background:#fff8ec;border-bottom:1px solid #eadbcc;gap:16px}
+h1{color:#9b352e;letter-spacing:-.7px;font-weight:800}
+h2,h3{color:#6f3930}.eyebrow{color:#886350;letter-spacing:1.5px}
+aside{background:#fffdf8;border-color:#eadbcc}
+.muted{color:#766357}.date{background:#fff;border-color:#eadbcc;color:#766357}
+button,select{border-color:#ddc7b5;border-radius:12px;color:#663e32;background:#fffefa}
+button:hover{background:#ffe9d7}#fit{background:#ffedcf;border-color:#eac995;font-weight:600}
+.note{background:#fff0df;border:1px solid #f0dcc7;border-radius:14px}
+.stat{background:#fff0e8;border-radius:12px}.stats{gap:10px}
+a{color:#a13c30}td,#details{border-color:#ecdfd4}
+.swatch{height:9px;border-radius:5px}.legend{gap:10px;margin-top:10px}
+nav{display:flex;gap:6px;align-items:center;flex-shrink:0}
+nav a{padding:8px 15px;border-radius:22px;text-decoration:none;font-size:14px;font-weight:700}
+nav a:hover{background:#f9e6d4}nav a[aria-current=page]{background:#a43d32;color:white}
+nav a:focus-visible{outline:3px solid #d99030;outline-offset:3px}
+.header-right{display:flex;align-items:center;gap:20px}
+.leaflet-popup-content-wrapper{border-radius:15px}.leaflet-popup-content{color:#49352f}
+@media(max-width:700px){header{height:auto;min-height:90px;flex-wrap:wrap;gap:8px}header h1{font-size:20px}.header-right{gap:10px;flex-wrap:wrap}.header-right .date{display:none}nav a{padding:6px 12px}}
